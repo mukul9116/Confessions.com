@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confessions Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #8b4513;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #cd853f, #daa520);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 150px;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .confession-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #fafafa;
+        }
+        .confession-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .confession-type {
+            background: #cd853f;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .confession-date {
+            color: #666;
+            font-size: 14px;
+        }
+        .confession-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .detail-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #cd853f;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #8b4513;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .detail-value {
+            margin-top: 5px;
+            color: #333;
+        }
+        .confession-text {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #daa520;
+            font-style: italic;
+            line-height: 1.5;
+        }
+        .refresh-btn {
+            background: #cd853f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .refresh-btn:hover {
+            background: #8b4513;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        @media (max-width: 768px) {
+            .confession-details {
+                grid-template-columns: 1fr;
+            }
+            .stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Confessions Admin Panel</h1>
+        
+        <button class="refresh-btn" onclick="loadConfessions()">🔄 Refresh Data</button>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCount">0</div>
+                <div>Total Confessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="loveCount">0</div>
+                <div>Love Confessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="anonymousCount">0</div>
+                <div>Anonymous</div>
+            </div>
+        </div>
+        
+        <div id="confessionsList">
+            <div class="loading">Loading confessions...</div>
+        </div>
+    </div>
+
+    <script>
+        async function loadConfessions() {
+            try {
+                const response = await fetch('/api/confessions');
+                const data = await response.json();
+                
+                displayStats(data);
+                displayConfessions(data);
+            } catch (error) {
+                document.getElementById('confessionsList').innerHTML = 
+                    '<div class="loading">Error loading confessions. Make sure server is running.</div>';
+            }
+        }
+        
+        function displayStats(confessions) {
+            document.getElementById('totalCount').textContent = confessions.length;
+            document.getElementById('loveCount').textContent = 
+                confessions.filter(c => c.confessionType === 'love').length;
+            document.getElementById('anonymousCount').textContent = 
+                confessions.filter(c => c.expressionType === 'anonymous').length;
+        }
+        
+        function displayConfessions(confessions) {
+            const container = document.getElementById('confessionsList');
+            
+            if (confessions.length === 0) {
+                container.innerHTML = '<div class="loading">No confessions yet.</div>';
+                return;
+            }
+            
+            container.innerHTML = confessions.map(confession => `
+                <div class="confession-card">
+                    <div class="confession-header">
+                        <span class="confession-type">${confession.confessionType.toUpperCase()}</span>
+                        <span class="confession-date">${new Date(confession.timestamp).toLocaleString()}</span>
+                    </div>
+                    
+                    <div class="confession-details">
+                        <div class="detail-item">
+                            <div class="detail-label">From</div>
+                            <div class="detail-value">${confession.userName}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Contact</div>
+                            <div class="detail-value">${confession.auth}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">To</div>
+                            <div class="detail-value">${confession.recipientName}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Recipient Contact</div>
+                            <div class="detail-value">${confession.recipientContact}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Expression Type</div>
+                            <div class="detail-value">${confession.expressionType}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="confession-text">
+                        "${confession.confession}"
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Load confessions on page load
+        loadConfessions();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadConfessions, 30000);
+    </script>
+</body>
+</html>

@@ -188,24 +188,28 @@
                     
                     <div class="confession-details">
                         <div class="detail-item">
-                            <div class="detail-label">From</div>
+                            <div class="detail-label">👤 User Name</div>
                             <div class="detail-value">${confession.userName}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Contact</div>
+                            <div class="detail-label">📱 User Contact (Mobile/Email)</div>
                             <div class="detail-value">${confession.auth}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">To</div>
+                            <div class="detail-label">💌 Recipient Name</div>
                             <div class="detail-value">${confession.recipientName}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Recipient Contact</div>
+                            <div class="detail-label">📞 Recipient Contact</div>
                             <div class="detail-value">${confession.recipientContact}</div>
                         </div>
                         <div class="detail-item">
-                            <div class="detail-label">Expression Type</div>
-                            <div class="detail-value">${confession.expressionType}</div>
+                            <div class="detail-label">🎭 Expression Type</div>
+                            <div class="detail-value">${confession.expressionType.toUpperCase()}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">💕 Confession Type</div>
+                            <div class="detail-value">${confession.confessionType.toUpperCase()}</div>
                         </div>
                     </div>
                     
